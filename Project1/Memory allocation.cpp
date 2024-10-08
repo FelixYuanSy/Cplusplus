@@ -134,6 +134,10 @@ class BST
 		return number;
 
 	}
+	int largest_integer(struct node* tree)
+	{
+		return 0;
+	}
 };
 
 
