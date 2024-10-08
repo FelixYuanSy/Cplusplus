@@ -3,6 +3,8 @@
 #include <crtdbg.h>
 #include <iostream>
 #include <cassert>
+#include <map>
+#include <functional>
 using namespace std;
 
 //1.Put the many of data more than momory supposed to use.
@@ -109,6 +111,28 @@ class BST
 			terminate_tree(tree->right);
 			delete tree;
 		}
+	}
+	void count_freq(struct node* tree, map<int, int>& freq_mp)
+	{
+		freq_mp[tree->value]++;
+		count_freq(tree->left,freq_mp);
+		count_freq(tree->right,freq_mp);
+	}
+	int most_common_integer(struct node* tree)
+	{
+		map<int, int> freq_map;
+		int freq = 0;
+		int number = tree->value;
+		for (auto& i : freq_map)
+		{
+			if (i.second > freq)
+			{
+				freq = i.second;
+				number = i.first;
+			}
+		}
+		return number;
+
 	}
 };
 
