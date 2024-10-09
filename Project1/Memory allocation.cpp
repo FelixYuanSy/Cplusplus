@@ -67,14 +67,43 @@ class BST
 		node* right;
 	};
 	struct node* root = NULL;
-	//Node* CreateNode(int value) 
-	//{
-	//	Node* newNode = new Node();
-	//	newNode->value = value;
-	//	newNode->left = newNode -> right = nullptr;
-	//	return newNode;
+public:
+	BST() {
+		root = nullptr;  // Initialize root -> nullptr
+	}
 
-	//}
+	void insert_integer(int value)
+	{
+		insert_integer(&root, value);
+	}
+
+	void print_tree()
+	{
+		print_tree(root);
+	}
+
+	int most_common_integer()
+	{
+		return most_common_integer(root);
+	}
+
+	int largest_integer()
+	{
+		return largest_integer(root);
+	}
+
+	int summ_of_all_integers()
+	{
+		return summ_of_all_integers(root);
+	}
+
+	void terminate_tree()
+	{
+		terminate_tree(root);
+	}
+
+private:
+
 	void insert_integer(struct node** tree, int value)
 	{
 		if (*tree == nullptr)
@@ -85,11 +114,11 @@ class BST
 			(*tree)->right = nullptr;
 
 		}
-		else if(value < (*tree)->value)
+		else if(value <= (*tree)->value)
 		{
 			insert_integer(&(*tree)->left, value);
 		}
-		else if (value > (*tree)->value)
+		else if (value >= (*tree)->value)
 		{
 			insert_integer(&(*tree)->right, value);
 		}
@@ -114,6 +143,9 @@ class BST
 	}
 	void count_freq(struct node* tree, map<int, int>& freq_mp)
 	{
+		if (tree == nullptr) {
+			return; 
+		}
 		freq_mp[tree->value]++;
 		count_freq(tree->left,freq_mp);
 		count_freq(tree->right,freq_mp);
@@ -121,6 +153,7 @@ class BST
 	int most_common_integer(struct node* tree)
 	{
 		map<int, int> freq_map;
+		count_freq(tree, freq_map);
 		int freq = 0;
 		int number = tree->value;
 		for (auto& i : freq_map)
@@ -136,7 +169,19 @@ class BST
 	}
 	int largest_integer(struct node* tree)
 	{
-		return 0;
+		while (tree->right != nullptr)
+		{
+			tree = tree->right;
+		}
+		return tree->value;
+	}
+	int summ_of_all_integers(struct node* tree)
+	{
+		if (tree == nullptr)
+		{
+			return 0;
+		}
+		return (tree->value) + summ_of_all_integers(tree->left) + summ_of_all_integers(tree->right);
 	}
 };
 
@@ -150,17 +195,34 @@ int main() {
 	//array[0] = 1;
 	//cout << array[0] << endl;
 
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	//cal_del::full_array();
-	//int* array = new int[10];
-	//for (int i = 0; i < 10; i++) {
-	//	array[i] = i;
-	//	cout << array[i] << endl;
-	//}
-	//delete[]array;
-	int* p = coh();
-	cout << *p << endl;
-	delete p;
+	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	////cal_del::full_array();
+	////int* array = new int[10];
+	////for (int i = 0; i < 10; i++) {
+	////	array[i] = i;
+	////	cout << array[i] << endl;
+	////}
+	////delete[]array;
+	//int* p = coh();
+	//cout << *p << endl;
+	//delete p;
+	BST b1;
+	b1.insert_integer(50);
+	b1.insert_integer(10);
+	b1.insert_integer(20);
+	b1.insert_integer(30);
+	b1.insert_integer(5);
+	b1.insert_integer(2);
+	b1.insert_integer(8);
+	b1.insert_integer(30);
+	b1.insert_integer(10);
+	b1.insert_integer(30);
+	b1.print_tree();
+	cout << endl;
+	cout<< "largest number " << b1.largest_integer() << endl;
+	cout << "most common number " << b1.most_common_integer() << endl;
+	cout << "sum of all number " << b1.summ_of_all_integers() << endl;
+	b1.terminate_tree();
 
 	return 0;
 

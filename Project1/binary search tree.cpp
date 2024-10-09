@@ -1,4 +1,6 @@
-#include <iostream>
-using namespace std;
-
-struct node
+//#include <iostream>
+//using namespace std;
+//int main()
+//{
+//	return 0;
+//}
