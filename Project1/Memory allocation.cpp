@@ -217,6 +217,7 @@ int main() {
 	b1.insert_integer(30);
 	b1.insert_integer(10);
 	b1.insert_integer(30);
+	b1.insert_integer(8);
 	b1.print_tree();
 	cout << endl;
 	cout<< "largest number " << b1.largest_integer() << endl;
