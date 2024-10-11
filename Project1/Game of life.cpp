@@ -2,7 +2,10 @@
 #include <vector>
 #include <ctime>
 #include <cstdlib>
-#include <set>
+#include <set> //avoid same element
+#include <chrono> //use sleep time
+#include <thread> // maybe unit of times
+#include <conio.h> //get user input in the game
 using namespace std;
 
 
@@ -18,6 +21,7 @@ private:
 	int getLiveAround(int row, int col)
 	{
 		int liveAround = 0;
+
 		for (int i = -1; i < 2; i++)
 		{
 			for (int j = -1; i = j < 2; j++)
@@ -25,9 +29,10 @@ private:
 				if (i == 0 && j == 0) { continue; }
 				int neighbor_Row = row + i;
 				int neighbor_Col = col + j;
-				if (neighbor_Row >= 0 && neighbor_Row < rows && neighbor_Col >= 0 && neighbor_Col < cols) 
+
+				if (neighbor_Row >= 0 && neighbor_Row < rows && neighbor_Col >= 0 && neighbor_Col < cols && grid[neighbor_Row][neighbor_Col]==1)
 				{
-					liveAround += grid[neighbor_Row][neighbor_Col];
+					liveAround ++;
 				}
 			}
 		}
@@ -75,14 +80,73 @@ public:
 		}
 	}
 
+	void update()
+	{
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < cols; j ++)
+			{
+				switch (getLiveAround(i, j)) {
+				case 2:
+					tempGrid[i][j] = grid[i][j];
+					break;
+				case 3:
+					tempGrid[i][j] = 1;
+					break;
+				default: 
+					tempGrid[i][j] = 0;
+				}
+			}
+		}
+
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < cols; j++)
+			{
+				grid[i][j] = tempGrid[i][j];
+				
+			}
+		}
+	}
+	void play_game()
+	{
+		int step = 1;
+		int run = 1;
+		bool pause = false;
+		while (run)
+		{
+			/*print_initialize();*/
+			if (!pause) 
+			{
+				cout << "steps: " << step++ << endl;
+				update();
+			}
+			this_thread::sleep_for(chrono::milliseconds(100));
+			if (_kbhit())
+			{
+				char input = _getch();
+				if (input == 'p')
+				{
+					pause = true;
+					cout << "Game paused. Press 'r' to resume, 'q' to quit."
+				}
+			}
+		}
+	}
+
 };
 	int main()
 	{
-		GameOfLife game(11, 11); // 创建一个 5x5 的游戏网格
-
-		game.initialize(5); // 随机生成5个活细胞
-		game.print_initialize();         // 打印当前的网格状态
-		return 0;
+		int rows, cols,inicial_number;
+		cout << "determined your grid size,rows and cols: ";
+		cin >> rows;
+		cin >> cols;
+		cout << "initial alive number:";
+		cin >> inicial_number;
+		GameOfLife game(rows, cols); 
+		game.initialize(inicial_number); 
+		game.print_initialize();
+		game.play_game();
 
 
 	}
