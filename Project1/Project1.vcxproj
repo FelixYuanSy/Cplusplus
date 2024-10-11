@@ -127,7 +127,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="binary search tree.cpp" />
     <ClCompile Include="Game of life.cpp" />
     <ClCompile Include="Memory allocation.cpp" />
   </ItemGroup>

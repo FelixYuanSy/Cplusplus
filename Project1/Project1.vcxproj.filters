@@ -21,8 +21,5 @@
     <ClCompile Include="Game of life.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="binary search tree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>
