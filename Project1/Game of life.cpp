@@ -24,7 +24,7 @@ private:
 
 		for (int i = -1; i < 2; i++)
 		{
-			for (int j = -1; i = j < 2; j++)
+			for (int j = -1;  j < 2; j++)
 			{
 				if (i == 0 && j == 0) { continue; }
 				int neighbor_Row = row + i;
@@ -50,8 +50,8 @@ public:
 		set<pair<int, int>> liveCells;
 		while (liveCells.size() < numliveCells)
 		{
-			int row = rand() % (rows-2)+1;
-			int col = rand() % (cols-2)+1;
+			int row = rand() % rows;
+			int col = rand() % cols;
 			liveCells.insert({ row,col });
 		}
 		for (auto cell : liveCells) //set generate cell to be live cell
@@ -60,22 +60,34 @@ public:
 		}
 	}
 
-	void print_initialize()
+	void print_Grid()
 	{
+		cout << "   ";
+		for (int j = 0; j < cols; j++)
+		{
+			if (j < 9) cout << " " << j;
+			else if (j == 9) cout << " " << j << " ";
+			else cout <<j;
+		}
+		cout << endl;
 		for (int i = 0; i < rows; i++)
 		{
+			if(i<10) cout << " " << i << " ";
+			else cout << i <<" ";
+
 			for (int j = 0; j < cols; j++)
 			{
+				cout << ".";
 				if (grid[i][j] == 1)
 				{
-					cout << "." << alive;
+					cout << alive;
 				}
 				else
 				{
-					cout << "." << dead;
-				}
-				
+					cout << dead;
+				}				
 			}
+			cout << ".";
 			cout << endl;
 		}
 	}
@@ -119,18 +131,44 @@ public:
 			if (!pause) 
 			{
 				cout << "steps: " << step++ << endl;
+				print_Grid();
 				update();
 			}
-			this_thread::sleep_for(chrono::milliseconds(100));
 			if (_kbhit())
 			{
 				char input = _getch();
 				if (input == 'p')
 				{
 					pause = true;
-					cout << "Game paused. Press 'r' to resume, 'q' to quit."
+					cout << "Game paused. Press 'r' to resume, 'q' to quit."<<endl;
+				}
+				else if (input == 'r')
+				{
+					pause = false;
+					cout << "game resumed" << endl;
+				}
+				else if (input == 'q')
+				{
+					cout << "game terminated" << endl;
+					break;
+				}
+				else if (input == 'a') {
+					int newRow, newCol;
+					cout << "input the new cell row and col : ";
+					cin >> newRow >> newCol;
+					if (newRow > 0 && newRow < rows && newCol > 0 && newCol < cols) // maybe < rows/cols-1
+					{
+						grid[newRow][newCol] = 1;
+						cout << "live cell added at" << newRow << "," << newCol << endl;
+					}
+					else
+					{
+						cout << "Invalid position" << endl;
+					}
+					
 				}
 			}
+			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
 	}
 
@@ -139,13 +177,12 @@ public:
 	{
 		int rows, cols,inicial_number;
 		cout << "determined your grid size,rows and cols: ";
-		cin >> rows;
-		cin >> cols;
+		cin >> rows >> cols;
 		cout << "initial alive number:";
 		cin >> inicial_number;
 		GameOfLife game(rows, cols); 
 		game.initialize(inicial_number); 
-		game.print_initialize();
+		game.print_Grid();
 		game.play_game();
 
 
