@@ -6,6 +6,7 @@
 #include <chrono> //use sleep time
 #include <thread> // maybe unit of times
 #include <conio.h> //get user input in the game
+#include <fstream> //save and load
 using namespace std;
 
 
@@ -169,6 +170,22 @@ public:
 				}
 			}
 			this_thread::sleep_for(chrono::milliseconds(1000));
+		}
+	}
+	void saveFile(const string &filename)
+	{
+		ofstream outfile(filename);
+		if (outfile.is_open())
+		{
+			outfile << rows << " " << cols;
+			for (int i = 0; i < rows; i++) 
+			{
+				for (int j = 0; j < cols; j++)
+				{
+					outfile << grid[i][j] << " ";
+				}
+				outfile << endl;
+			}
 		}
 	}
 
