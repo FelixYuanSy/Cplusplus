@@ -7,6 +7,8 @@
 #include <thread> // maybe unit of times
 #include <conio.h> //get user input in the game
 #include <fstream> //save and load
+#include <string>
+#include <map>
 using namespace std;
 
 
@@ -14,6 +16,7 @@ class GameOfLife
 {
 private:
 	int rows, cols;
+	//int step = 1;
 	vector<vector<int>> grid;
 	vector<vector<int>> tempGrid;
 	const string alive = "O";
@@ -41,6 +44,7 @@ private:
 	}
 
 public:
+	int step = 1;
 	GameOfLife(int r, int c) : rows(r), cols(c), grid(r, vector<int>(c, 0)), tempGrid(r, vector<int>(c, 0))
 	{
 	}
@@ -63,18 +67,18 @@ public:
 
 	void print_Grid()
 	{
-		cout << "   ";
+		/*cout << "   ";
 		for (int j = 0; j < cols; j++)
 		{
 			if (j < 9) cout << " " << j;
 			else if (j == 9) cout << " " << j << " ";
 			else cout <<j;
 		}
-		cout << endl;
+		cout << endl;*/
 		for (int i = 0; i < rows; i++)
 		{
-			if(i<10) cout << " " << i << " ";
-			else cout << i <<" ";
+			/*if(i<10) cout << " " << i << " ";
+			else cout << i <<" ";*/
 
 			for (int j = 0; j < cols; j++)
 			{
@@ -123,15 +127,17 @@ public:
 	}
 	void play_game()
 	{
-		int step = 1;
+		
 		int run = 1;
 		bool pause = false;
+		//int step = 1;
 		while (run)
 		{
 			if (!pause) 
 			{
 				cout << "steps: " << step++ << endl;
 				print_Grid();
+				detect_patterns(grid);
 				update();
 			}
 			if (_kbhit())
@@ -177,7 +183,8 @@ public:
 				}
 
 			}
-			this_thread::sleep_for(chrono::milliseconds(1000));
+
+			this_thread::sleep_for(chrono::milliseconds(600));
 		}
 	}
 	void saveFile(const string &filename)
@@ -213,6 +220,7 @@ public:
 				{
 					infile >> grid[i][j];
 				}
+				cout << endl;
 			}
 			cout << "game loaded" << endl;
 			infile.close();
@@ -222,22 +230,31 @@ public:
 			cout << "not found this game" << endl;
 		}
 	}
-	//void detect_patterns(int row, int col)
-	//{
-	//	bool beehive = false;
-	//	/*for (int i = -1; i <= 2; i++)
-	//	{
-	//		for (int j = 0; j <= 2; j++)
-	//		{
-	//			if(grid[row][col] == 1 && )
-	//		}
-	//	}*/
-	//	if (grid[row][col] == 1 && grid[row][col + 1] == 1 && grid[row + 1][col - 1] == 1 && grid[row + 1][col + 2] == 1 && grid[row][col] == 1 && grid[row + 2][col] == 1 && grid[row + 2][col + 1] == 1)
-	//	{
-	//		cout << step;
-	//	}
-	//}
+	void detect_patterns(vector<vector<int>>& grid)
+	{
+		map<string, string> search_patterns;
+		search_patterns["1111"] = "block";
+		search_patterns["011010010110"] = "beehive";
 
+		
+
+
+		
+
+		
+	}
+	string Patterns(vector<vector<int>>&grid, int startRow, int startCol, int patternRow, int patternCol)
+			{
+				string pattern = "";
+				for (int i = 0; i < startRow+ patternRow; i++)
+				{
+					for (int j = 0; j < startCol + patternCol; j++)
+					{
+						pattern += to_string(grid[i][j]);
+					}
+				}
+				return pattern;
+			}
 
 };
 	int main()
