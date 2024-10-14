@@ -128,7 +128,6 @@ public:
 		bool pause = false;
 		while (run)
 		{
-			/*print_initialize();*/
 			if (!pause) 
 			{
 				cout << "steps: " << step++ << endl;
@@ -153,7 +152,8 @@ public:
 					cout << "game terminated" << endl;
 					break;
 				}
-				else if (input == 'a') {
+				else if (input == 'a') 
+				{
 					int newRow, newCol;
 					cout << "input the new cell row and col : ";
 					cin >> newRow >> newCol;
@@ -162,12 +162,20 @@ public:
 						grid[newRow][newCol] = 1;
 						cout << "live cell added at" << newRow << "," << newCol << endl;
 					}
-					else
-					{
-						cout << "Invalid position" << endl;
-					}
-					
+			
 				}
+				else if (input == 's')
+				{
+					string filename;
+					cout << "enter the game name: ";
+					cin >> filename;
+					saveFile(filename);
+				}
+				else
+				{
+					cout << "Invalid position" << endl;
+				}
+
 			}
 			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
@@ -187,20 +195,85 @@ public:
 				outfile << endl;
 			}
 		}
+	
+		cout << "game saved in" << filename << endl;
+		outfile.close();
 	}
+	void loadFile(const string& filename)
+	{
+		ifstream infile(filename);
+		if (infile.is_open())
+		{
+			infile >> rows >> cols;
+			grid.resize(rows,vector<int>(cols,0));
+			tempGrid.resize(rows, vector<int>(cols, 0));
+			for (int i = 0; i < rows; i++)
+			{
+				for (int j = 0; j < cols; j++)
+				{
+					infile >> grid[i][j];
+				}
+			}
+			cout << "game loaded" << endl;
+			infile.close();
+		}
+		else
+		{
+			cout << "not found this game" << endl;
+		}
+	}
+	//void detect_patterns(int row, int col)
+	//{
+	//	bool beehive = false;
+	//	/*for (int i = -1; i <= 2; i++)
+	//	{
+	//		for (int j = 0; j <= 2; j++)
+	//		{
+	//			if(grid[row][col] == 1 && )
+	//		}
+	//	}*/
+	//	if (grid[row][col] == 1 && grid[row][col + 1] == 1 && grid[row + 1][col - 1] == 1 && grid[row + 1][col + 2] == 1 && grid[row][col] == 1 && grid[row + 2][col] == 1 && grid[row + 2][col + 1] == 1)
+	//	{
+	//		cout << step;
+	//	}
+	//}
+
 
 };
 	int main()
 	{
 		int rows, cols,inicial_number;
-		cout << "determined your grid size,rows and cols: ";
-		cin >> rows >> cols;
-		cout << "initial alive number:";
-		cin >> inicial_number;
-		GameOfLife game(rows, cols); 
-		game.initialize(inicial_number); 
-		game.print_Grid();
-		game.play_game();
+		string choice,filename;
+		cout << "Do you want to start new game or loaded a game? (N/L)" << endl;
+		cin >> choice;
+		if (choice == "L")
+
+		{	
+			cout << "filename: ";
+			cin >> filename;
+			ifstream inFile(filename);
+			if (inFile.is_open())
+			{
+				inFile >> rows >> cols;
+				GameOfLife game(rows,cols);
+				game.loadFile(filename);
+				game.print_Grid();
+				game.play_game();
+			}
+
+		}
+		else
+		{
+			cout << "determined your grid size,rows and cols: ";
+			cin >> rows >> cols;
+			cout << "initial alive number:";
+			cin >> inicial_number;
+			GameOfLife game(rows, cols); 
+			game.initialize(inicial_number); 
+			game.print_Grid();
+			game.play_game();
+
+		}
 
 
 	}
