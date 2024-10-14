@@ -230,18 +230,79 @@ public:
 			cout << "not found this game" << endl;
 		}
 	}
-	void detect_patterns(vector<vector<int>>& grid)
+	bool detect_patterns(vector<vector<int>>& grid)
 	{
-		map<string, string> search_patterns;
-		search_patterns["1111"] = "block";
-		search_patterns["011010010110"] = "beehive";
+		int rows = grid.size();
+		int cols = grid[0].size();
 
-		
+		for (int i = 0; i < rows - 1; i++)
+		{
+			for (int j = 0; j < cols - 1; j++)
+			{
+				if (grid[i][j] == 1 && grid[i][j + 1] == 1 &&
+					grid[i + 1][j] == 1 && grid[i + 1][j + 1] == 1)
+				{
+					cout << "generate block used"<<step << endl;
+					return true;
 
+				}
+			}
+		}
 
-		
+		for (int i = 0; i < rows - 2; i++)
+		{
+			for (int j = 0; j < cols - 3; j++)
+			{
+				if (grid[i][j + 1] == 1 && grid[i][j + 2] == 1 &&
+					grid[i + 1][j] == 1 && grid[i + 1][j + 3] == 1 &&
+					grid[i + 2][j + 1] == 1 && grid[i + 2][j + 2] == 1)
+				{
+					cout << "generate beehive used" << step << endl;
+					return true;
 
-		
+				}
+			}
+		}
+
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; i < cols; j++)
+			{
+				if (grid[i][j] == 1 & grid[i][j + 1] == 1 && 
+					grid[i][j + 2] == 1)
+				{
+					cout << "Generate Blinker used" << step << endl;
+					return true;
+				}
+			}
+		}
+
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; i < cols; j++)
+			{
+				if (grid[i][j] == 1 & grid[i][j + 1] == 1 && grid[i][j + 2] == 1)
+				{
+					cout << "Generate Blinker used" << step << endl;
+					return true;
+
+				}
+			}
+		}
+		for (int i = 0; i < rows - 3; i++)  // LWSS is 4 cells tall
+		{
+			for (int j = 0; j < cols - 4; j++)  // LWSS is 5 cells wide
+			{
+				if (grid[i][j + 1] == 1 && grid[i][j + 4] == 1 && grid[i+1][j] == 1 &&
+					grid[i + 2][j] == 1 && grid[i + 3][j] == 1 &&
+					grid[i + 3][j + 1] == 1 &&
+					grid[i + 3][j+2] == 1 && grid[i + 3][j + 3] == 1)
+				{
+					cout << "Generate LWSS used" << step << endl;
+					return true;
+				}
+			}
+		}
 	}
 	string Patterns(vector<vector<int>>&grid, int startRow, int startCol, int patternRow, int patternCol)
 			{
