@@ -45,6 +45,10 @@ private:
 
 public:
 	int step = 1;
+	bool block = 0;
+	bool beehive = 0;
+	bool blinker = 0;
+	bool LWSS = 0;
 	GameOfLife(int r, int c) : rows(r), cols(c), grid(r, vector<int>(c, 0)), tempGrid(r, vector<int>(c, 0))
 	{
 	}
@@ -173,7 +177,7 @@ public:
 
 			}
 
-			this_thread::sleep_for(chrono::milliseconds(600));
+			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
 	}
 	void saveFile(const string &filename)
@@ -223,79 +227,59 @@ public:
 	{
 		int rows = grid.size();
 		int cols = grid[0].size();
-		
-		bool block = true;
-		if (block == true)
+		if (block==0)
 		{
-			for (int i = 0; i < rows - 1; i++)   
-			{
-				for (int j = 0; j < cols - 1; j++)
-				{
-					if (grid[i][j] == 1 && grid[i][j + 1] == 1 &&
-						grid[i + 1][j] == 1 && grid[i + 1][j + 1] == 1)
+		for (int i = 0; i < rows - 1; i++)   
 					{
-						cout << "generate block used"<<step << endl;
-						block =  false;
-						break;
-
+						for (int j = 0; j < cols - 1; j++)
+						{
+							if (grid[i][j] == 1 && grid[i][j + 1] == 1 &&
+								grid[i + 1][j] == 1 && grid[i + 1][j + 1] == 1)
+							{
+								cout << "generate block used"<<step << endl;
+								block = 1;
+								return;
+						
+							}
+						}
 					}
-				}
-			}
 
 		}
-		
-		bool beehive = true;
-		if(beehive == true)
+		if (beehive == 0)
 		{
 			for (int i = 0; i < rows - 2; i++)
 			{
 				for (int j = 0; j < cols - 3; j++)
-				{
+					{
 					if (grid[i][j + 1] == 1 && grid[i][j + 2] == 1 &&
 						grid[i + 1][j] == 1 && grid[i + 1][j + 3] == 1 &&
 						grid[i + 2][j + 1] == 1 && grid[i + 2][j + 2] == 1)
 					{
 						cout << "generate beehive used" << step << endl;
-						beehive = false;
-						break;
+						beehive = 1;
+						return;
 					}
 				}
-			} 
-		}
-		
-		bool blinker = true;
-		if (blinker == true)
-		{
-		for (int i = 0; i < rows - 1; i++)
-			{
-				for (int j = 0; j < cols - 2 ; j++)
-				{
-						if (grid[i][j] == 1 && grid[i][j + 1] == 1 && 
-							grid[i][j + 2] == 1)
-						{
-							cout << "Generate Blinker used" << step << endl;
-							blinker = false;
-							break;
-						}
-					}
-				}
-		}
-		
-		//for (int i = 0; i < rows; i++)
-		//{
-		//	for (int j = 0; j < cols - 2; j++)
-		//	{
-		//		if (grid[i][j] == 1 && grid[i][j + 1] == 1 && grid[i][j + 2] == 1)
-		//		{
-		//			cout << "Generate Blinker used" << step << endl;
-		//			return true;
-		//			break;
 
-		//		}
-		//	}
-		//}
-		bool LWSS = true;
-		if (LWSS == true)
+			}
+		}
+		if (blinker == 0)
+		{
+			for (int i = 0; i < rows - 1; i++)
+			{
+				for (int j = 0; j < cols - 2; j++)
+				{
+					if (grid[i][j] == 1 && grid[i][j + 1] == 1 &&
+						grid[i][j + 2] == 1)
+					{
+						cout << "Generate Blinker used" << step << endl;
+						blinker = 1;
+						return;
+					}
+				}
+			}
+		}
+		if (LWSS = 0)
 		{
 			for (int i = 0; i < rows - 3; i++)  
 			{
@@ -306,28 +290,14 @@ public:
 						grid[i + 3][j + 1] == 1 &&
 						grid[i + 3][j+2] == 1 && grid[i + 3][j + 3] == 1)
 					{
-						cout << "Generate LWSS used" << step << endl;
-						LWSS = false;
-						break;
+						cout << "Generate LWSS used " << step << "steps" << endl;
+						LWSS = 1;
+						return;
 					}
 				}
 			}
-		}
-		
+		}	
 	}
-//	string Patterns(vector<vector<int>>&grid, int startRow, int startCol, int patternRow, int patternCol)
-//			{
-//				string pattern = "";
-//				for (int i = 0; i < startRow+ patternRow; i++)
-//				{
-//					for (int j = 0; j < startCol + patternCol; j++)
-//					{
-//						pattern += to_string(grid[i][j]);
-//					}
-//				}
-//				return pattern;
-//			}
-//
 };
 	int main()
 	{
@@ -363,6 +333,4 @@ public:
 			game.play_game();
 
 		}
-
-
 	}
