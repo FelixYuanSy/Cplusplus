@@ -45,6 +45,7 @@ private:
 
 public:
 	int step = 1;
+	int initial_live_number;
 	bool block = 0;
 	bool beehive = 0;
 	bool blinker = 0;
@@ -55,6 +56,8 @@ public:
 
 	void initialize(int numliveCells)
 	{
+		initial_live_number = numliveCells;
+		clear_grid();
 		srand(time(0));
 		set<pair<int, int>> liveCells;
 		while (liveCells.size() < numliveCells)
@@ -68,7 +71,16 @@ public:
 			grid[cell.first][cell.second] = 1;
 		}
 	}
-
+	void clear_grid()
+	{
+		for (int i = 0; i < grid.size(); i++)
+		{
+			for (int j = 0; j < grid[0].size(); j++)
+			{
+				grid[i][j] = 0;
+			}
+		}
+	}
 	void print_Grid()
 	{
 
@@ -121,11 +133,17 @@ public:
 			}
 		}
 	}
-	void play_game()
+	void play_game(int max_step)
 	{
+
 		bool pause = false;
 		while (true)
 		{
+			if (max_step > 0 && step > max_step)
+			{
+				cout << "reached max step" << endl;
+				break;
+			}
 			if (!pause) 
 			{
 				cout << "steps: " << step++ << endl;
@@ -139,24 +157,19 @@ public:
 				if (input == 'p')
 				{
 					pause = true;
-					cout << "Game paused. Press 'r' to resume, 'q' to quit."<<endl;
+					cout << "Game paused. Press 'r' to resume, 'q' to quit, 's' to save"<<endl;
 				}
 				else if (input == 'r')
 				{
 					pause = false;
 					cout << "game resumed" << endl;
 				}
-				else if (input == 'q')
-				{
-					cout << "game terminated" << endl;
-					break;
-				}
 				else if (input == 'a') 
 				{
 					int newRow, newCol;
 					cout << "input the new cell row and col : ";
 					cin >> newRow >> newCol;
-					if (newRow > 0 && newRow < rows && newCol > 0 && newCol < cols) // maybe < rows/cols-1
+					if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) 
 					{
 						grid[newRow][newCol] = 1;
 						cout << "live cell added at" << newRow << "," << newCol << endl;
@@ -170,14 +183,23 @@ public:
 					cin >> filename;
 					saveFile(filename);
 				}
+				else if (input == 't')
+				{
+					initialize(initial_live_number);
+					step = 1;
+					block = false;
+					beehive = false;
+					blinker = false;
+					LWSS = false;
+				}
 				else
 				{
-					cout << "Invalid position" << endl;
+					cout << "Invalid put" << endl;
 				}
 
 			}
 
-			this_thread::sleep_for(chrono::milliseconds(1000));
+			this_thread::sleep_for(chrono::milliseconds(500));
 		}
 	}
 	void saveFile(const string &filename)
@@ -185,7 +207,9 @@ public:
 		ofstream outfile(filename);
 		if (outfile.is_open())
 		{
-			outfile << rows << " " << cols;
+			outfile << step << endl;
+			outfile << initial_live_number;
+			outfile << rows << " " << cols << endl;
 			for (int i = 0; i < rows; i++) 
 			{
 				for (int j = 0; j < cols; j++)
@@ -204,7 +228,9 @@ public:
 		ifstream infile(filename);
 		if (infile.is_open())
 		{
+			infile >> step;
 			infile >> rows >> cols;
+			infile >> initial_live_number;
 			grid.resize(rows,vector<int>(cols,0));
 			tempGrid.resize(rows, vector<int>(cols, 0));
 			for (int i = 0; i < rows; i++)
@@ -229,20 +255,41 @@ public:
 		int cols = grid[0].size();
 		if (block==0)
 		{
-		for (int i = 0; i < rows - 1; i++)   
+			for (int i = 0; i < rows - 1; i++)   
+			{
+				for (int j = 0; j < cols - 1; j++)
+				{
+					if (grid[i][j] == 1 && grid[i][j + 1] == 1 &&
+						grid[i + 1][j] == 1 && grid[i + 1][j + 1] == 1)
 					{
-						for (int j = 0; j < cols - 1; j++)
+						bool isSurroundingEmpty = true;
+
+						// 上边界
+						if (i > 0)
+							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0);
+
+						// 下边界
+						if (i + 2 < rows)
+							isSurroundingEmpty &= (grid[i + 2][j] == 0 && grid[i + 2][j + 1] == 0);
+
+						// 左边界
+						if (j > 0)
+							isSurroundingEmpty &= (grid[i][j - 1] == 0 && grid[i + 1][j - 1] == 0);
+
+						// 右边界
+						if (j + 2 < cols)
+							isSurroundingEmpty &= (grid[i][j + 2] == 0 && grid[i + 1][j + 2] == 0);
+						if (isSurroundingEmpty)
 						{
-							if (grid[i][j] == 1 && grid[i][j + 1] == 1 &&
-								grid[i + 1][j] == 1 && grid[i + 1][j + 1] == 1)
-							{
-								cout << "generate block used"<<step << endl;
-								block = 1;
-								return;
-						
-							}
+							cout << "generate block used " << step << "steps" << endl;
+							block = 1;
+							return;
 						}
+
+
 					}
+				}
+			}
 
 		}
 		if (beehive == 0)
@@ -255,9 +302,30 @@ public:
 						grid[i + 1][j] == 1 && grid[i + 1][j + 3] == 1 &&
 						grid[i + 2][j + 1] == 1 && grid[i + 2][j + 2] == 1)
 					{
-						cout << "generate beehive used" << step << endl;
-						beehive = 1;
-						return;
+						bool isSurroundingEmpty = true;
+
+						// 上边界
+						if (i > 0)
+							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0 && grid[i - 1][j + 2] == 0 && grid[i - 1][j + 3] == 0);
+
+						// 下边界
+						if (i + 3 < rows)
+							isSurroundingEmpty &= (grid[i + 3][j] == 0 && grid[i + 3][j + 1] == 0 && grid[i + 3][j + 2] == 0 && grid[i + 3][j + 3] == 0);
+
+						// 左边界
+						if (j > 0)
+							isSurroundingEmpty &= (grid[i][j - 1] == 0 && grid[i + 1][j - 1] == 0 && grid[i + 2][j - 1] == 0);
+
+						// 右边界
+						if (j + 4 < cols)
+							isSurroundingEmpty &= (grid[i][j + 4] == 0 && grid[i + 1][j + 4] == 0 && grid[i + 2][j + 4] == 0);
+
+						if (isSurroundingEmpty)
+						{
+							cout << "generate beehive used " << step << "steps" << endl;
+							beehive = 1;
+							return;
+						}
 					}
 				}
 
@@ -272,14 +340,35 @@ public:
 					if (grid[i][j] == 1 && grid[i][j + 1] == 1 &&
 						grid[i][j + 2] == 1)
 					{
-						cout << "Generate Blinker used" << step << endl;
-						blinker = 1;
-						return;
+						bool isSurroundingEmpty = true;
+
+						// 上边界
+						if (i > 0)
+							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0 && grid[i - 1][j + 2] == 0);
+
+						// 下边界
+						if (i + 1 < rows)
+							isSurroundingEmpty &= (grid[i + 1][j] == 0 && grid[i + 1][j + 1] == 0 && grid[i + 1][j + 2] == 0);
+
+						// 左边界
+						if (j > 0)
+							isSurroundingEmpty &= (grid[i][j - 1] == 0);
+
+						// 右边界
+						if (j + 3 < cols)
+							isSurroundingEmpty &= (grid[i][j + 3] == 0);
+
+						if (isSurroundingEmpty)
+						{
+							cout << "Generate Blinker used " << step << "steps" << endl;
+							blinker = 1;
+							return;
+						}
 					}
 				}
 			}
 		}
-		if (LWSS = 0)
+		if (LWSS == 0)
 		{
 			for (int i = 0; i < rows - 3; i++)  
 			{
@@ -290,9 +379,31 @@ public:
 						grid[i + 3][j + 1] == 1 &&
 						grid[i + 3][j+2] == 1 && grid[i + 3][j + 3] == 1)
 					{
-						cout << "Generate LWSS used " << step << "steps" << endl;
-						LWSS = 1;
-						return;
+
+						bool isSurroundingEmpty = true;
+
+						// 上边界
+						if (i > 0)
+							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0 && grid[i - 1][j + 2] == 0 && grid[i - 1][j + 3] == 0 && grid[i - 1][j + 4] == 0);
+
+						// 下边界
+						if (i + 4 < rows)
+							isSurroundingEmpty &= (grid[i + 4][j] == 0 && grid[i + 4][j + 1] == 0 && grid[i + 4][j + 2] == 0 && grid[i + 4][j + 3] == 0 && grid[i + 4][j + 4] == 0);
+
+						// 左边界
+						if (j > 0)
+							isSurroundingEmpty &= (grid[i][j - 1] == 0 && grid[i + 1][j - 1] == 0 && grid[i + 2][j - 1] == 0 && grid[i + 3][j - 1] == 0);
+
+						// 右边界
+						if (j + 5 < cols)
+							isSurroundingEmpty &= (grid[i][j + 5] == 0 && grid[i + 1][j + 5] == 0 && grid[i + 2][j + 5] == 0 && grid[i + 3][j + 5] == 0);
+
+						if (isSurroundingEmpty)
+						{
+							cout << "Generate LWSS used " << step << "steps" << endl;
+							LWSS = 1;
+							return;
+						}
 					}
 				}
 			}
@@ -301,8 +412,9 @@ public:
 };
 	int main()
 	{
-		int rows, cols,inicial_number;
-		string choice,filename;
+		int rows, cols, inicial_number;
+		int max_step = -1;
+		string choice,filename, step_choice;
 		cout << "Do you want to start new game or loaded a game? (N/L)" << endl;
 		cin >> choice;
 		if (choice == "L")
@@ -314,10 +426,10 @@ public:
 			if (inFile.is_open())
 			{
 				inFile >> rows >> cols;
+				inFile >> max_step;
 				GameOfLife game(rows,cols);
 				game.loadFile(filename);
-				game.print_Grid();
-				game.play_game();
+				game.play_game(max_step);
 			}
 
 		}
@@ -327,10 +439,16 @@ public:
 			cin >> rows >> cols;
 			cout << "initial alive number:";
 			cin >> inicial_number;
+			cout << "Do you want to set max step?(Y/N)";
+			cin >> step_choice;
+			if (step_choice == "Y")
+			{
+				cout << "put in max steps: ";
+				cin >> max_step;
+			}
 			GameOfLife game(rows, cols); 
 			game.initialize(inicial_number); 
-			game.print_Grid();
-			game.play_game();
+			game.play_game(max_step);
 
 		}
 	}
