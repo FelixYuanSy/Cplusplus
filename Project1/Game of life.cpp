@@ -50,6 +50,7 @@ public:
 	bool beehive = 0;
 	bool blinker = 0;
 	bool LWSS = 0;
+	bool pause = false;
 	GameOfLife(int r, int c) : rows(r), cols(c), grid(r, vector<int>(c, 0)), tempGrid(r, vector<int>(c, 0))
 	{
 	}
@@ -136,7 +137,7 @@ public:
 	void play_game(int max_step)
 	{
 
-		bool pause = false;
+		pause = false;
 		while (true)
 		{
 			if (max_step > 0 && step > max_step)
@@ -281,8 +282,10 @@ public:
 							isSurroundingEmpty &= (grid[i][j + 2] == 0 && grid[i + 1][j + 2] == 0);
 						if (isSurroundingEmpty)
 						{
-							cout << "generate block used " << step << "steps" << endl;
+							cout << "generate block used " << step << " steps" << endl;
 							block = 1;
+							pause = true;
+							cout << "press r to continue" << endl;
 							return;
 						}
 
@@ -322,8 +325,10 @@ public:
 
 						if (isSurroundingEmpty)
 						{
-							cout << "generate beehive used " << step << "steps" << endl;
+							cout << "generate beehive used " << step << " steps" << endl;
 							beehive = 1;
+							pause = true;
+							cout << "press r to continue" << endl;
 							return;
 						}
 					}
@@ -360,8 +365,9 @@ public:
 
 						if (isSurroundingEmpty)
 						{
-							cout << "Generate Blinker used " << step << "steps" << endl;
+							cout << "Generate Blinker used " << step << " steps" << endl;
 							blinker = 1;
+							cout << "press r to continue" << endl;
 							return;
 						}
 					}
@@ -400,8 +406,9 @@ public:
 
 						if (isSurroundingEmpty)
 						{
-							cout << "Generate LWSS used " << step << "steps" << endl;
+							cout << "Generate LWSS used " << step << " steps" << endl;
 							LWSS = 1;
+							cout << "press r to continue" << endl;
 							return;
 						}
 					}
