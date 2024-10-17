@@ -446,6 +446,14 @@ public:
 		}
 	}
 };
+
+class addPatterns
+{
+	void add_Block()
+	{
+		for()
+	}
+}
 	int main()
 	{
 		int rows, cols, inicial_number;
@@ -488,3 +496,12 @@ public:
 
 		}
 	}
+	/*question 5:
+	block ->8
+	beehive -> 11
+	
+	
+	
+	
+	
+	*/
