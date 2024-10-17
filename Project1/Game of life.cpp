@@ -50,6 +50,7 @@ public:
 	bool beehive = 0;
 	bool blinker = 0;
 	bool LWSS = 0;
+	bool toad = 0;
 	bool pause = false;
 	GameOfLife(int r, int c) : rows(r), cols(c), grid(r, vector<int>(c, 0)), tempGrid(r, vector<int>(c, 0))
 	{
@@ -147,9 +148,10 @@ public:
 			}
 			if (!pause) 
 			{
-				cout << "steps: " << step++ << endl;
 				print_Grid();
+				cout << "steps: " << step << endl;
 				detect_patterns(grid);
+				step++;
 				update();
 			}
 			if (_kbhit())
@@ -191,6 +193,7 @@ public:
 					block = false;
 					beehive = false;
 					blinker = false;
+					toad = false;
 					LWSS = false;
 				}
 				else
@@ -254,6 +257,7 @@ public:
 	{
 		int rows = grid.size();
 		int cols = grid[0].size();
+		bool partten_detect = false;
 		if (block==0)
 		{
 			for (int i = 0; i < rows - 1; i++)   
@@ -265,28 +269,25 @@ public:
 					{
 						bool isSurroundingEmpty = true;
 
-						// 上边界
+
 						if (i > 0)
 							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0);
 
-						// 下边界
 						if (i + 2 < rows)
 							isSurroundingEmpty &= (grid[i + 2][j] == 0 && grid[i + 2][j + 1] == 0);
 
-						// 左边界
-						if (j > 0)
-							isSurroundingEmpty &= (grid[i][j - 1] == 0 && grid[i + 1][j - 1] == 0);
 
-						// 右边界
+						if (j > 0)
+							isSurroundingEmpty &= (grid[i][j - 1] == 0 && grid[i + 1][j - 1] == 0 && grid[i - 1][j - 1] == 0 && grid[i + 2][j - 1] == 0);
+
+
 						if (j + 2 < cols)
-							isSurroundingEmpty &= (grid[i][j + 2] == 0 && grid[i + 1][j + 2] == 0);
+							isSurroundingEmpty &= (grid[i][j + 2] == 0 && grid[i + 1][j + 2] == 0 && grid[i - 1][j + 2] == 0 && grid[i + 2][j + 2] == 0);
 						if (isSurroundingEmpty)
 						{
 							cout << "generate block used " << step << " steps" << endl;
 							block = 1;
-							pause = true;
-							cout << "press r to continue" << endl;
-							return;
+							partten_detect = true;
 						}
 
 
@@ -307,29 +308,24 @@ public:
 					{
 						bool isSurroundingEmpty = true;
 
-						// 上边界
 						if (i > 0)
 							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0 && grid[i - 1][j + 2] == 0 && grid[i - 1][j + 3] == 0);
 
-						// 下边界
 						if (i + 3 < rows)
 							isSurroundingEmpty &= (grid[i + 3][j] == 0 && grid[i + 3][j + 1] == 0 && grid[i + 3][j + 2] == 0 && grid[i + 3][j + 3] == 0);
 
-						// 左边界
 						if (j > 0)
-							isSurroundingEmpty &= (grid[i][j - 1] == 0 && grid[i + 1][j - 1] == 0 && grid[i + 2][j - 1] == 0);
+							isSurroundingEmpty &= (grid[i][j - 1] == 0 && grid[i + 1][j - 1] == 0 && grid[i + 2][j - 1] == 0 && grid[i + 3][j - 1] == 0 && grid[i - 1][j - 1] == 0);
 
-						// 右边界
 						if (j + 4 < cols)
-							isSurroundingEmpty &= (grid[i][j + 4] == 0 && grid[i + 1][j + 4] == 0 && grid[i + 2][j + 4] == 0);
+							isSurroundingEmpty &= (grid[i - 1][j + 4] == 0 && grid[i][j + 4] == 0 && grid[i + 1][j + 4] == 0 && grid[i + 2][j + 4] == 0 && grid[i + 3][j + 4] == 0);
 
 						if (isSurroundingEmpty)
 						{
 							cout << "generate beehive used " << step << " steps" << endl;
 							beehive = 1;
-							pause = true;
-							cout << "press r to continue" << endl;
-							return;
+							partten_detect = true;
+
 						}
 					}
 				}
@@ -347,19 +343,15 @@ public:
 					{
 						bool isSurroundingEmpty = true;
 
-						// 上边界
 						if (i > 0)
 							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0 && grid[i - 1][j + 2] == 0);
 
-						// 下边界
 						if (i + 1 < rows)
 							isSurroundingEmpty &= (grid[i + 1][j] == 0 && grid[i + 1][j + 1] == 0 && grid[i + 1][j + 2] == 0);
 
-						// 左边界
 						if (j > 0)
 							isSurroundingEmpty &= (grid[i][j - 1] == 0);
 
-						// 右边界
 						if (j + 3 < cols)
 							isSurroundingEmpty &= (grid[i][j + 3] == 0);
 
@@ -367,8 +359,40 @@ public:
 						{
 							cout << "Generate Blinker used " << step << " steps" << endl;
 							blinker = 1;
-							cout << "press r to continue" << endl;
-							return;
+							partten_detect = true;
+						}
+					}
+				}
+			}
+		}
+		if (toad == 0)
+		{
+			for (int i = 0; i < rows - 3; i++)
+			{
+				for (int j = 0; j < cols - 4; j++)
+				{
+					if (grid[i][j + 1] == 1 && grid[i][j + 2] == 1 && grid[i][j + 3] == 1
+						&& grid[i + 1][j] == 1 && grid[i + 1][j + 1] == 1 && grid[i + 1][j + 2])
+					{
+						bool isSurroundingEmpty = true;
+
+						if (i > 0)
+							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0 && grid[i - 1][j + 2] == 0 && grid[i - 1][j + 3] == 0);
+
+						if (i + 2 < rows)
+							isSurroundingEmpty &= (grid[i + 2][j] == 0 && grid[i + 2][j + 1] == 0 && grid[i + 2][j + 2] == 0 && grid[i + 2][j + 3] == 0);
+
+						if (j > 0)
+							isSurroundingEmpty &= (grid[i][j - 1] == 0 && grid[i + 1][j - 1] == 0);
+
+						if (j + 4 < cols)
+							isSurroundingEmpty &= (grid[i][j + 4] == 0 && grid[i + 1][j + 4] == 0);
+
+						if (isSurroundingEmpty)
+						{
+							cout << "Generate Blinker used " << step << " steps" << endl;
+							blinker = 1;
+							partten_detect = true;
 						}
 					}
 				}
@@ -388,19 +412,15 @@ public:
 
 						bool isSurroundingEmpty = true;
 
-						// 上边界
 						if (i > 0)
 							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0 && grid[i - 1][j + 2] == 0 && grid[i - 1][j + 3] == 0 && grid[i - 1][j + 4] == 0);
 
-						// 下边界
 						if (i + 4 < rows)
 							isSurroundingEmpty &= (grid[i + 4][j] == 0 && grid[i + 4][j + 1] == 0 && grid[i + 4][j + 2] == 0 && grid[i + 4][j + 3] == 0 && grid[i + 4][j + 4] == 0);
 
-						// 左边界
 						if (j > 0)
 							isSurroundingEmpty &= (grid[i][j - 1] == 0 && grid[i + 1][j - 1] == 0 && grid[i + 2][j - 1] == 0 && grid[i + 3][j - 1] == 0);
 
-						// 右边界
 						if (j + 5 < cols)
 							isSurroundingEmpty &= (grid[i][j + 5] == 0 && grid[i + 1][j + 5] == 0 && grid[i + 2][j + 5] == 0 && grid[i + 3][j + 5] == 0);
 
@@ -408,13 +428,17 @@ public:
 						{
 							cout << "Generate LWSS used " << step << " steps" << endl;
 							LWSS = 1;
-							cout << "press r to continue" << endl;
-							return;
+							partten_detect = true;
 						}
 					}
 				}
 			}
-		}	
+		}
+		if (partten_detect == true)
+		{
+			pause = true;
+			cout << "press r to continue" << endl;
+		}
 	}
 };
 	int main()
