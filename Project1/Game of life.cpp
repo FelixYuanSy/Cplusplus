@@ -260,9 +260,9 @@ public:
 		bool partten_detect = false;
 		if (block==0)
 		{
-			for (int i = 0; i < rows - 1; i++)   
+			for (int i = 0; i < rows - 2; i++)   
 			{
-				for (int j = 0; j < cols - 1; j++)
+				for (int j = 0; j < cols - 2; j++)
 				{
 					if (grid[i][j] == 1 && grid[i][j + 1] == 1 &&
 						grid[i + 1][j] == 1 && grid[i + 1][j + 1] == 1)
@@ -270,24 +270,26 @@ public:
 						bool isSurroundingEmpty = true;
 
 
-						if (i > 0)
+						if (i - 1 >= 0 && j + 1 <= cols)
 							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0);
 
-						if (i + 2 < rows)
+						if (i + 2 <= rows && j + 1 <= cols)
 							isSurroundingEmpty &= (grid[i + 2][j] == 0 && grid[i + 2][j + 1] == 0);
 
-
-						if (j > 0)
+						if (i - 1 > 0 && i + 2 < rows && j - 1 > 0 && j + 2 < cols)
 							isSurroundingEmpty &= (grid[i][j - 1] == 0 && grid[i + 1][j - 1] == 0 && grid[i - 1][j - 1] == 0 && grid[i + 2][j - 1] == 0);
 
-
-						if (j + 2 < cols)
+						if(i - 1 > 0 && i + 2 < rows && j + 2 < cols)
 							isSurroundingEmpty &= (grid[i][j + 2] == 0 && grid[i + 1][j + 2] == 0 && grid[i - 1][j + 2] == 0 && grid[i + 2][j + 2] == 0);
+
+						
+
 						if (isSurroundingEmpty)
 						{
-							cout << "generate block used " << step << " steps" << endl;
 							block = 1;
 							partten_detect = true;
+							cout << "generate block used " << step << " steps" << endl;
+							break;
 						}
 
 
@@ -298,9 +300,9 @@ public:
 		}
 		if (beehive == 0)
 		{
-			for (int i = 0; i < rows - 2; i++)
+			for (int i = 0; i < rows - 3; i++)
 			{
-				for (int j = 0; j < cols - 3; j++)
+				for (int j = 0; j < cols - 4; j++)
 					{
 					if (grid[i][j + 1] == 1 && grid[i][j + 2] == 1 &&
 						grid[i + 1][j] == 1 && grid[i + 1][j + 3] == 1 &&
@@ -308,23 +310,23 @@ public:
 					{
 						bool isSurroundingEmpty = true;
 
-						if (i > 0)
+						if (i - 1 > 0 && j + 3 < cols)
 							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0 && grid[i - 1][j + 2] == 0 && grid[i - 1][j + 3] == 0);
 
-						if (i + 3 < rows)
+						if (i + 3 < rows && j + 3 < cols)
 							isSurroundingEmpty &= (grid[i + 3][j] == 0 && grid[i + 3][j + 1] == 0 && grid[i + 3][j + 2] == 0 && grid[i + 3][j + 3] == 0);
 
-						if (j > 0)
+						if (i + 3 < rows && i - 1 > 0 && j - 1 > 0)
 							isSurroundingEmpty &= (grid[i][j - 1] == 0 && grid[i + 1][j - 1] == 0 && grid[i + 2][j - 1] == 0 && grid[i + 3][j - 1] == 0 && grid[i - 1][j - 1] == 0);
 
-						if (j + 4 < cols)
+						if (i - 1 > 0 && i + 3 < rows && j + 4 < cols)
 							isSurroundingEmpty &= (grid[i - 1][j + 4] == 0 && grid[i][j + 4] == 0 && grid[i + 1][j + 4] == 0 && grid[i + 2][j + 4] == 0 && grid[i + 3][j + 4] == 0);
-
 						if (isSurroundingEmpty)
 						{
 							cout << "generate beehive used " << step << " steps" << endl;
 							beehive = 1;
 							partten_detect = true;
+							break;
 
 						}
 					}
@@ -336,7 +338,7 @@ public:
 		{
 			for (int i = 0; i < rows - 1; i++)
 			{
-				for (int j = 0; j < cols - 2; j++)
+				for (int j = 0; j < cols - 3; j++)
 				{
 					if (grid[i][j] == 1 && grid[i][j + 1] == 1 &&
 						grid[i][j + 2] == 1)
@@ -358,8 +360,9 @@ public:
 						if (isSurroundingEmpty)
 						{
 							cout << "Generate Blinker used " << step << " steps" << endl;
-							blinker = 1;
 							partten_detect = true;
+							blinker = 1;
+							break;
 						}
 					}
 				}
@@ -393,6 +396,7 @@ public:
 							cout << "Generate Blinker used " << step << " steps" << endl;
 							blinker = 1;
 							partten_detect = true;
+							break;
 						}
 					}
 				}
@@ -400,9 +404,9 @@ public:
 		}
 		if (LWSS == 0)
 		{
-			for (int i = 0; i < rows - 3; i++)  
+			for (int i = 0; i < rows - 4; i++)  
 			{
-				for (int j = 0; j < cols - 4; j++)  
+				for (int j = 0; j < cols - 5; j++)  
 				{
 					if (grid[i][j + 1] == 1 && grid[i][j + 4] == 1 && grid[i+1][j] == 1 &&
 						grid[i + 2][j] == 1 && grid[i + 3][j] == 1 &&
@@ -429,6 +433,7 @@ public:
 							cout << "Generate LWSS used " << step << " steps" << endl;
 							LWSS = 1;
 							partten_detect = true;
+							break;
 						}
 					}
 				}
