@@ -16,7 +16,6 @@ class GameOfLife
 {
 private:
 	int rows, cols;
-	//int step = 1;
 	vector<vector<int>> grid;
 	vector<vector<int>> tempGrid;
 	const string alive = "O";
@@ -25,7 +24,6 @@ private:
 	int getLiveAround(int row, int col)
 	{
 		int liveAround = 0;
-
 		for (int i = -1; i < 2; i++)
 		{
 			for (int j = -1;  j < 2; j++)
@@ -34,7 +32,7 @@ private:
 				int neighbor_Row = row + i;
 				int neighbor_Col = col + j;
 
-				if (neighbor_Row >= 0 && neighbor_Row < rows && neighbor_Col >= 0 && neighbor_Col < cols && grid[neighbor_Row][neighbor_Col]==1)
+				if (neighbor_Row >= 1 && neighbor_Row <= rows && neighbor_Col >= 1 && neighbor_Col <= cols && grid[neighbor_Row][neighbor_Col]==1)
 				{
 					liveAround ++;
 				}
@@ -52,7 +50,7 @@ public:
 	bool LWSS = 0;
 	bool toad = 0;
 	bool pause = false;
-	GameOfLife(int r, int c) : rows(r), cols(c), grid(r, vector<int>(c, 0)), tempGrid(r, vector<int>(c, 0))
+	GameOfLife(int r, int c) : rows(r), cols(c), grid(r + 2, vector<int>(c + 2, 0)), tempGrid(r + 2, vector<int>(c + 2, 0))
 	{
 	}
 
@@ -64,8 +62,8 @@ public:
 		set<pair<int, int>> liveCells;
 		while (liveCells.size() < numliveCells)
 		{
-			int row = rand() % rows;
-			int col = rand() % cols;
+			int row = rand() % rows + 1;
+			int col = rand() % cols + 1;
 			liveCells.insert({ row,col });
 		}
 		for (auto cell : liveCells) //set generate cell to be live cell
@@ -86,11 +84,11 @@ public:
 	void print_Grid()
 	{
 
-		for (int i = 0; i < rows; i++)
+		for (int i = 1; i <= rows; i++)
 		{
 
 
-			for (int j = 0; j < cols; j++)
+			for (int j = 1; j <= cols; j++)
 			{
 				cout << ".";
 				if (grid[i][j] == 1)
@@ -109,26 +107,40 @@ public:
 
 	void update()
 	{
-		for (int i = 0; i < rows; i++)
+		for (int i = 1; i <= rows; i++)
 		{
-			for (int j = 0; j < cols; j ++)
+			for (int j = 1; j <= cols; j++)
 			{
-				switch (getLiveAround(i, j)) {
-				case 2:
-					tempGrid[i][j] = grid[i][j];
-					break;
-				case 3:
-					tempGrid[i][j] = 1;
-					break;
-				default: 
-					tempGrid[i][j] = 0;
+				int liveAround = getLiveAround(i, j);
+				if (grid[i][j] == 1)  // 活细胞
+				{
+					if (liveAround == 2 || liveAround == 3)
+					{
+						tempGrid[i][j] = 1;  // 继续存活
+					}
+					else
+					{
+						tempGrid[i][j] = 0;  // 死亡
+					}
+				}
+
+				else  // 当前是死细胞
+				{
+					if (liveAround == 3)
+					{
+						tempGrid[i][j] = 1;  // 复活
+					}
+					else
+					{
+						tempGrid[i][j] = 0;  // 保持死亡
+					}
 				}
 			}
 		}
 
-		for (int i = 0; i < rows; i++)
+		for (int i = 1; i <= rows; i++)
 		{
-			for (int j = 0; j < cols; j++)
+			for (int j = 1; j <= cols; j++)
 			{
 				grid[i][j] = tempGrid[i][j];
 				
@@ -160,7 +172,7 @@ public:
 				if (input == 'p')
 				{
 					pause = true;
-					cout << "Game paused. Press 'r' to resume, 'q' to quit, 's' to save"<<endl;
+					cout << "Game paused. Press 'r' to resume, 's' to save"<<endl;
 				}
 				else if (input == 'r')
 				{
@@ -172,7 +184,7 @@ public:
 					int newRow, newCol;
 					cout << "input the new cell row and col : ";
 					cin >> newRow >> newCol;
-					if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) 
+					if (newRow >= 1 && newRow < rows && newCol >= 1 && newCol < cols) 
 					{
 						grid[newRow][newCol] = 1;
 						cout << "live cell added at" << newRow << "," << newCol << endl;
@@ -212,19 +224,19 @@ public:
 		if (outfile.is_open())
 		{
 			outfile << step << endl;
-			outfile << initial_live_number;
+			outfile << initial_live_number << endl;
 			outfile << rows << " " << cols << endl;
-			for (int i = 0; i < rows; i++) 
+			for (int i = 1; i <= rows; i++) 
 			{
-				for (int j = 0; j < cols; j++)
+				for (int j = 1; j <= cols; j++)
 				{
-					outfile << grid[i][j];
+					outfile << grid[i][j] << " ";
 				}
 				outfile << endl;
 			}
 		}
 	
-		cout << "game saved in" << filename << endl;
+		cout << "Game saved in " << filename << endl;
 		outfile.close();
 	}
 	void loadFile(const string& filename)
@@ -233,19 +245,20 @@ public:
 		if (infile.is_open())
 		{
 			infile >> step;
-			infile >> rows >> cols;
 			infile >> initial_live_number;
-			grid.resize(rows,vector<int>(cols,0));
-			tempGrid.resize(rows, vector<int>(cols, 0));
-			for (int i = 0; i < rows; i++)
+			infile >> rows >> cols;
+
+			grid.resize(rows + 2,vector<int>(cols + 2, 0));
+			tempGrid.resize(rows + 2, vector<int>(cols + 2, 0));
+			for (int i = 1; i <= rows; i++)
 			{
-				for (int j = 0; j < cols; j++)
+				for (int j = 1; j <= cols; j++)
 				{
 					infile >> grid[i][j];
 				}
 				cout << endl;
 			}
-			cout << "game loaded" << endl;
+			cout << "Game loaded" << endl;
 			infile.close();
 		}
 		else
@@ -253,207 +266,104 @@ public:
 			cout << "not found this game" << endl;
 		}
 	}
+	bool findPattern(vector<vector<int>>& grid, vector<vector<int>>& pattern)
+	{
+		int patternRows = pattern.size();
+		int patternCols = pattern[0].size();
+
+		for (int i = 1; i + patternRows <= rows + 1; i++)
+		{
+			for (int j = 1; j + patternCols <= cols + 1; j++)
+			{
+				bool if_find = true;
+				for (int x = 0; x < patternRows; x++)
+				{
+					for (int y = 0; y < patternCols; y++)
+					{
+						if (grid[i + x][j + y] != pattern[x][y])
+						{
+							if_find = false;
+							break;
+						}
+					}
+					if (if_find == false)
+						break;
+				}
+			
+				if (if_find == true)
+					return true;
+			}
+
+
+		}
+		return false;
+	}
+	
+	void notice_pattern(bool &if_detect_pattern,vector<vector<int>> &grid,vector<vector<int>> &pattern, int step, string pattern_name, bool & pattern_detect)
+	{
+		if (if_detect_pattern == false && findPattern(grid, pattern))
+		{
+			cout << "Generate "  << pattern_name << " used" << step <<" steps"<< endl;
+			if_detect_pattern = true;
+			pattern_detect = true;
+		}
+	}
+	
 	void detect_patterns(vector<vector<int>>& grid)
 	{
-		int rows = grid.size();
-		int cols = grid[0].size();
-		bool partten_detect = false;
-		if (block==0)
-		{
-			for (int i = 0; i < rows - 2; i++)   
-			{
-				for (int j = 0; j < cols - 2; j++)
-				{
-					if (grid[i][j] == 1 && grid[i][j + 1] == 1 &&
-						grid[i + 1][j] == 1 && grid[i + 1][j + 1] == 1)
-					{
-						bool isSurroundingEmpty = true;
+		vector<vector<int>> block_pattern = {
+			{0, 0, 0, 0},
+			{0, 1, 1, 0},
+			{0, 1, 1, 0},
+			{0, 0, 0, 0}
+		};
 
+		vector<vector<int>> beehive_pattern = {
+			{0, 0, 0, 0, 0, 0},
+			{0, 0, 1, 1, 0, 0},
+			{0, 1, 0, 0, 1, 0},
+			{0, 0, 1, 1, 0, 0},
+			{0, 0, 0, 0, 0, 0}
+		};
 
-						if (i - 1 >= 0 && j + 1 <= cols)
-							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0);
+		vector<vector<int>> blinker_pattern = {
+			{0, 0, 0, 0, 0},
+			{0, 1, 1, 1, 0},
+			{0, 0, 0, 0, 0}
+		};
 
-						if (i + 2 <= rows && j + 1 <= cols)
-							isSurroundingEmpty &= (grid[i + 2][j] == 0 && grid[i + 2][j + 1] == 0);
+		vector<vector<int>> toad_pattern = {
+			{0, 0, 0, 0, 0, 0},
+			{0, 0, 1, 1, 1, 0},
+			{0, 1, 1, 1, 0, 0},
+			{0, 0, 0, 0, 0, 0}
+		};
 
-						if (i - 1 > 0 && i + 2 < rows && j - 1 > 0 && j + 2 < cols)
-							isSurroundingEmpty &= (grid[i][j - 1] == 0 && grid[i + 1][j - 1] == 0 && grid[i - 1][j - 1] == 0 && grid[i + 2][j - 1] == 0);
+		vector<vector<int>> LWSS_pattern = {
+			{0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 1, 1, 1, 1, 0},
+			{0, 1, 0, 0, 0, 1, 0},
+			{0, 0, 0, 0, 1, 0, 0},
+			{0, 1, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0}
+		};
+	
+		bool pattern_detect = false;
+		notice_pattern(block, grid, block_pattern, step, "Block", pattern_detect);
+		notice_pattern(beehive, grid, beehive_pattern, step, "Beehive", pattern_detect);
+		notice_pattern(blinker, grid, blinker_pattern, step, "Blinker", pattern_detect);
+		notice_pattern(toad, grid, toad_pattern, step, "Toad", pattern_detect);
+		notice_pattern(LWSS, grid, LWSS_pattern, step, "LWSS", pattern_detect);
 
-						if(i - 1 > 0 && i + 2 < rows && j + 2 < cols)
-							isSurroundingEmpty &= (grid[i][j + 2] == 0 && grid[i + 1][j + 2] == 0 && grid[i - 1][j + 2] == 0 && grid[i + 2][j + 2] == 0);
-
-						
-
-						if (isSurroundingEmpty)
-						{
-							block = 1;
-							partten_detect = true;
-							cout << "generate block used " << step << " steps" << endl;
-							break;
-						}
-
-
-					}
-				}
-			}
-
-		}
-		if (beehive == 0)
-		{
-			for (int i = 0; i < rows - 3; i++)
-			{
-				for (int j = 0; j < cols - 4; j++)
-					{
-					if (grid[i][j + 1] == 1 && grid[i][j + 2] == 1 &&
-						grid[i + 1][j] == 1 && grid[i + 1][j + 3] == 1 &&
-						grid[i + 2][j + 1] == 1 && grid[i + 2][j + 2] == 1)
-					{
-						bool isSurroundingEmpty = true;
-
-						if (i - 1 > 0 && j + 3 < cols)
-							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0 && grid[i - 1][j + 2] == 0 && grid[i - 1][j + 3] == 0);
-
-						if (i + 3 < rows && j + 3 < cols)
-							isSurroundingEmpty &= (grid[i + 3][j] == 0 && grid[i + 3][j + 1] == 0 && grid[i + 3][j + 2] == 0 && grid[i + 3][j + 3] == 0);
-
-						if (i + 3 < rows && i - 1 > 0 && j - 1 > 0)
-							isSurroundingEmpty &= (grid[i][j - 1] == 0 && grid[i + 1][j - 1] == 0 && grid[i + 2][j - 1] == 0 && grid[i + 3][j - 1] == 0 && grid[i - 1][j - 1] == 0);
-
-						if (i - 1 > 0 && i + 3 < rows && j + 4 < cols)
-							isSurroundingEmpty &= (grid[i - 1][j + 4] == 0 && grid[i][j + 4] == 0 && grid[i + 1][j + 4] == 0 && grid[i + 2][j + 4] == 0 && grid[i + 3][j + 4] == 0);
-						if (isSurroundingEmpty)
-						{
-							cout << "generate beehive used " << step << " steps" << endl;
-							beehive = 1;
-							partten_detect = true;
-							break;
-
-						}
-					}
-				}
-
-			}
-		}
-		if (blinker == 0)
-		{
-			for (int i = 0; i < rows - 1; i++)
-			{
-				for (int j = 0; j < cols - 3; j++)
-				{
-					if (grid[i][j] == 1 && grid[i][j + 1] == 1 &&
-						grid[i][j + 2] == 1)
-					{
-						bool isSurroundingEmpty = true;
-
-						if (i > 0)
-							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0 && grid[i - 1][j + 2] == 0);
-
-						if (i + 1 < rows)
-							isSurroundingEmpty &= (grid[i + 1][j] == 0 && grid[i + 1][j + 1] == 0 && grid[i + 1][j + 2] == 0);
-
-						if (j > 0)
-							isSurroundingEmpty &= (grid[i][j - 1] == 0);
-
-						if (j + 3 < cols)
-							isSurroundingEmpty &= (grid[i][j + 3] == 0);
-
-						if (isSurroundingEmpty)
-						{
-							cout << "Generate Blinker used " << step << " steps" << endl;
-							partten_detect = true;
-							blinker = 1;
-							break;
-						}
-					}
-				}
-			}
-		}
-		if (toad == 0)
-		{
-			for (int i = 0; i < rows - 3; i++)
-			{
-				for (int j = 0; j < cols - 4; j++)
-				{
-					if (grid[i][j + 1] == 1 && grid[i][j + 2] == 1 && grid[i][j + 3] == 1
-						&& grid[i + 1][j] == 1 && grid[i + 1][j + 1] == 1 && grid[i + 1][j + 2])
-					{
-						bool isSurroundingEmpty = true;
-
-						if (i > 0)
-							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0 && grid[i - 1][j + 2] == 0 && grid[i - 1][j + 3] == 0);
-
-						if (i + 2 < rows)
-							isSurroundingEmpty &= (grid[i + 2][j] == 0 && grid[i + 2][j + 1] == 0 && grid[i + 2][j + 2] == 0 && grid[i + 2][j + 3] == 0);
-
-						if (j > 0)
-							isSurroundingEmpty &= (grid[i][j - 1] == 0 && grid[i + 1][j - 1] == 0);
-
-						if (j + 4 < cols)
-							isSurroundingEmpty &= (grid[i][j + 4] == 0 && grid[i + 1][j + 4] == 0);
-
-						if (isSurroundingEmpty)
-						{
-							cout << "Generate Blinker used " << step << " steps" << endl;
-							blinker = 1;
-							partten_detect = true;
-							break;
-						}
-					}
-				}
-			}
-		}
-		if (LWSS == 0)
-		{
-			for (int i = 0; i < rows - 4; i++)  
-			{
-				for (int j = 0; j < cols - 5; j++)  
-				{
-					if (grid[i][j + 1] == 1 && grid[i][j + 4] == 1 && grid[i+1][j] == 1 &&
-						grid[i + 2][j] == 1 && grid[i + 3][j] == 1 &&
-						grid[i + 3][j + 1] == 1 &&
-						grid[i + 3][j+2] == 1 && grid[i + 3][j + 3] == 1)
-					{
-
-						bool isSurroundingEmpty = true;
-
-						if (i > 0)
-							isSurroundingEmpty &= (grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0 && grid[i - 1][j + 2] == 0 && grid[i - 1][j + 3] == 0 && grid[i - 1][j + 4] == 0);
-
-						if (i + 4 < rows)
-							isSurroundingEmpty &= (grid[i + 4][j] == 0 && grid[i + 4][j + 1] == 0 && grid[i + 4][j + 2] == 0 && grid[i + 4][j + 3] == 0 && grid[i + 4][j + 4] == 0);
-
-						if (j > 0)
-							isSurroundingEmpty &= (grid[i][j - 1] == 0 && grid[i + 1][j - 1] == 0 && grid[i + 2][j - 1] == 0 && grid[i + 3][j - 1] == 0);
-
-						if (j + 5 < cols)
-							isSurroundingEmpty &= (grid[i][j + 5] == 0 && grid[i + 1][j + 5] == 0 && grid[i + 2][j + 5] == 0 && grid[i + 3][j + 5] == 0);
-
-						if (isSurroundingEmpty)
-						{
-							cout << "Generate LWSS used " << step << " steps" << endl;
-							LWSS = 1;
-							partten_detect = true;
-							break;
-						}
-					}
-				}
-			}
-		}
-		if (partten_detect == true)
+		if (pattern_detect == true)
 		{
 			pause = true;
 			cout << "press r to continue" << endl;
 		}
+
 	}
 };
 
-class addPatterns
-{
-	void add_Block()
-	{
-		for()
-	}
-}
 	int main()
 	{
 		int rows, cols, inicial_number;
@@ -477,7 +387,7 @@ class addPatterns
 			}
 
 		}
-		else
+		else if (choice == "N")
 		{
 			cout << "determined your grid size,rows and cols: ";
 			cin >> rows >> cols;
@@ -497,8 +407,10 @@ class addPatterns
 		}
 	}
 	/*question 5:
+	* ERN:
 	block ->8
 	beehive -> 11
+	blinker -> 6
 	
 	
 	
